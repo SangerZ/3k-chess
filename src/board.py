@@ -11,12 +11,13 @@ class Board:
     def populate_board(self):
         print("[Board] Populating board with pieces...")
         from piece import Piece
-        self.grid[7][4] = Piece('Liu Bei', 'Shu', 'LB', self.king_moves, self.rally_ability, 'king')
-        self.grid[7][3] = Piece('Zhuge Liang', 'Shu', 'ZL', self.queen_moves, self.swap_ability, 'queen')
-        self.grid[7][1] = Piece('Zhao Yun', 'Shu', 'ZY', self.knight_moves, self.charge_ability, 'knight')
-        self.grid[0][4] = Piece('Cao Cao', 'Wei', 'CC', self.king_moves, self.rally_ability, 'king')
-        self.grid[0][3] = Piece('Sima Yi', 'Wei', 'SY', self.queen_moves, self.swap_ability, 'queen')
-        self.grid[0][1] = Piece('Zhang Liao', 'Wei', 'ZL', self.knight_moves, self.charge_ability, 'knight')
+        from ability import rally_ability, swap_ability, charge_ability
+        self.grid[7][4] = Piece('Liu Bei', 'Shu', 'LB', self.king_moves, rally_ability, 'king')
+        self.grid[7][3] = Piece('Zhuge Liang', 'Shu', 'ZL', self.queen_moves, swap_ability, 'queen')
+        self.grid[7][1] = Piece('Zhao Yun', 'Shu', 'ZY', self.knight_moves, charge_ability, 'knight')
+        self.grid[0][4] = Piece('Cao Cao', 'Wei', 'CC', self.king_moves, None, 'king')
+        self.grid[0][3] = Piece('Sima Yi', 'Wei', 'SY', self.queen_moves, None, 'queen')
+        self.grid[0][1] = Piece('Zhang Liao', 'Wei', 'ZL', self.knight_moves, None, 'knight')
 
         # Pawns for Shu (row 6)
         for col in range(8):
@@ -145,35 +146,4 @@ class Board:
         ]
         return [(nx, ny) for nx, ny in candidates if 0 <= nx < 8 and 0 <= ny < 8]
 
-    def rally_ability(self, board, pos):
-        print(f"[Ability] Rally activated at {pos}")
-        row, col = pos
-        faction = self.grid[row][col].faction
-        for c in range(8):
-            piece = self.grid[row][c]
-            if piece and piece.faction == faction:
-                piece.extra_moves = 1
-                print(f"[Ability] {piece.name} at ({row},{c}) gets extra move.")
-        return AbilityResult.END_TURN
-
-    def swap_ability(self, board, pos):
-        print(f"[Ability] Swap activated at {pos}")
-        row, col = pos
-        faction = self.grid[row][col].faction
-        for r in range(8):
-            if r != row:
-                piece = self.grid[r][col]
-                if piece and piece.faction == faction:
-                    self.grid[row][col], self.grid[r][col] = self.grid[r][col], self.grid[row][col]
-                    print(f"[Ability] Swapped with {piece.name} at ({r},{col})")
-                    break
-        # End the turn immediately after using swap, just like rally
-        return AbilityResult.END_TURN
-
-    def charge_ability(self, board, pos):
-        print(f"[Ability] Charge activated at {pos}")
-        row, col = pos
-        piece = self.grid[row][col]
-        piece.extra_moves = 2
-        print(f"[Ability] {piece.name} at ({row},{col}) can move twice this turn.")
-        return AbilityResult.ALLOW_EXTRA_MOVES
+    # ...existing code...
